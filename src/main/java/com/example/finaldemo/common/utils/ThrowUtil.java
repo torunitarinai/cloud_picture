@@ -1,9 +1,10 @@
 package com.example.finaldemo.common.utils;
 
+import cn.hutool.core.util.StrUtil;
 import com.example.finaldemo.exception.BusinessException;
 import com.example.finaldemo.exception.ErrorCode;
 
-public class ThrowUtils {
+public class ThrowUtil {
 
     /**
      * 条件成立则抛异常
@@ -36,6 +37,17 @@ public class ThrowUtils {
      */
     public static void throwIf(boolean condition, ErrorCode errorCode, String message) {
         throwIf(condition, new BusinessException(errorCode, message));
+    }
+
+    public static void StrParamsBlankCheck(String ... params) {
+        if (params == null || params.length == 0) {
+            return;
+        }
+        for (String param : params){
+            if (StrUtil.isBlank(param)){
+                throw new BusinessException(ErrorCode.PARAMS_ERROR);
+            }
+        }
     }
 }
 
