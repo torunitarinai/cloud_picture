@@ -4,6 +4,8 @@ import cn.hutool.core.util.StrUtil;
 import com.example.finaldemo.exception.BusinessException;
 import com.example.finaldemo.exception.ErrorCode;
 
+import java.util.Objects;
+
 public class ThrowUtil {
 
     /**
@@ -28,6 +30,14 @@ public class ThrowUtil {
         throwIf(condition, new BusinessException(errorCode));
     }
 
+
+    public static void throwIf(boolean condition, ErrorCode errorCode, Runnable r) {
+        if (Objects.nonNull(r)) {
+            r.run();
+        }
+        throwIf(condition, new BusinessException(errorCode));
+    }
+
     /**
      * 条件成立则抛异常
      *
@@ -39,12 +49,12 @@ public class ThrowUtil {
         throwIf(condition, new BusinessException(errorCode, message));
     }
 
-    public static void StrParamsBlankCheck(String ... params) {
+    public static void StrParamsBlankCheck(String... params) {
         if (params == null || params.length == 0) {
             return;
         }
-        for (String param : params){
-            if (StrUtil.isBlank(param)){
+        for (String param : params) {
+            if (StrUtil.isBlank(param)) {
                 throw new BusinessException(ErrorCode.PARAMS_ERROR);
             }
         }

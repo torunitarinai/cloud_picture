@@ -1,17 +1,21 @@
 package com.example.finaldemo.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import com.example.finaldemo.common.utils.JWTUtil;
+import com.example.finaldemo.common.utils.RSAUtil;
 import com.example.finaldemo.common.utils.ThrowUtil;
 import com.example.finaldemo.dao.mapper.UserMapper;
 import com.example.finaldemo.exception.BusinessException;
 import com.example.finaldemo.exception.ErrorCode;
 import com.example.finaldemo.service.IUserRegister;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserRegisterImpl implements IUserRegister {
     private final UserMapper userMapper;
-
+    @Value("${jwt.secret-key}")
+    private String secretKey;
     public UserRegisterImpl(UserMapper userMapper) {
         this.userMapper = userMapper;
     }
@@ -25,8 +29,10 @@ public class UserRegisterImpl implements IUserRegister {
         long count = userMapper.countByAccount(userAccount);
         ThrowUtil.throwIf(count != 0,ErrorCode.PARAMS_ERROR,"账号已存在");
 
-        //region 生成accessToken
+        //region 注册账号
 
+        //region 生成jwt
+        //JWTUtil.generateJwt(secretKey,)
         //endregion
 
     }
