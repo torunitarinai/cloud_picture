@@ -5,9 +5,9 @@ import com.example.finaldemo.exception.BusinessException;
 import com.example.finaldemo.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -15,11 +15,11 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class JWTService {
-    @Value("${jwt.secret-key}")
-    private String secretKey;
+
+    private final SecretKey SECRET_KEY = JWTUtil.getSecretKey();
 
     public Map<String, String> getJwtMap(String userAccount, String role, String userName, int amount) {
-        return JWTUtil.generateJwt(secretKey, userAccount, role, userName, amount);
+        return JWTUtil.generateJwt(SECRET_KEY, userAccount, role, userName, amount);
     }
 
     /**
@@ -27,12 +27,12 @@ public class JWTService {
      * @return 是否有效 有效->true
      */
     public boolean verify(String token) {
-        Claims verify = JWTUtil.verify(secretKey, token);
+        Claims verify = JWTUtil.verify(SECRET_KEY, token);
         return Objects.nonNull(verify);
     }
 
     public Optional<Claims> getTokenClaims(String token) {
-        return Optional.ofNullable(JWTUtil.verify(secretKey, token));
+        return Optional.ofNullable(JWTUtil.verify(SECRET_KEY, token));
     }
 
     public String refreshAccessToken(String refreshToken) {
@@ -43,6 +43,6 @@ public class JWTService {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "token不合法");
         });
 
-        return JWTUtil.generateAccessToken(tokenClaims.get(), this.secretKey, 0);
+        return JWTUtil.generateAccessToken(tokenClaims.get(), this.SECRET_KEY, 0);
     }
 }

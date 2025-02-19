@@ -4,12 +4,15 @@ import java.util.Date;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 用户表
  * @TableName user
  */
-@Data
+@Getter
+@Setter
 @Builder
 public class User {
     /**

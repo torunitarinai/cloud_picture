@@ -69,21 +69,21 @@ public class JWTUtil {
     }
 
 
-    public static String generateAccessToken(Claims claims, String secretKey, int amount) {
+    public static String generateAccessToken(Claims claims, SecretKey secretKey, int amount) {
         Calendar calendar = Calendar.getInstance();
         Date expTime;
         //默认过期时间
         if (amount <= 0) {
-            calendar.add(Calendar.HOUR,1);
+            calendar.add(Calendar.HOUR, 1);
             expTime = calendar.getTime();
-        }else {
-            calendar.add(Calendar.HOUR,amount);
+        } else {
+            calendar.add(Calendar.HOUR, amount);
             expTime = calendar.getTime();
         }
 
-        SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
 
-        return Jwts.builder().signWith(key).expiration(expTime).claims(claims).compact();
+
+        return Jwts.builder().signWith(secretKey).expiration(expTime).claims(claims).compact();
     }
 
     /**
@@ -119,7 +119,7 @@ public class JWTUtil {
 
         //组装claims
         Map<String, Object> claims = new HashMap<>() {{
-            put("userId", userAccount);
+            put("userAccount", userAccount);
             put("role", role);
             put("description", "access");
         }};
@@ -137,7 +137,7 @@ public class JWTUtil {
         instance.add(Calendar.DAY_OF_MONTH, 5);
         Date refreshExpDate = instance.getTime();
         Map<String, Object> refreshClaims = new HashMap<>() {{
-            put("userId", userAccount);
+            put("userAccount", userAccount);
             put("role", role);
 
             put("description", "refresh");
@@ -154,15 +154,108 @@ public class JWTUtil {
         }};
     }
 
+
+    public static Map<String, String> generateJwt(SecretKey sk, String userAccount, String role, String userName, int amount) {
+        ThrowUtil.throwIf(StrUtil.isBlank(userAccount), ErrorCode.OPERATION_ERROR, () -> log.error("{}::userAccount为空", JWTUtil.class));
+        //默认过期时间1小时
+        Date expDate;
+        Calendar calendar = Calendar.getInstance();
+        if (amount <= 0) {
+            calendar.add(Calendar.HOUR, 1);
+            expDate = calendar.getTime();
+        } else {
+            calendar.add(Calendar.HOUR, amount);
+            expDate = calendar.getTime();
+        }
+
+        //如果userName为空则用userAccount代替
+        if (StrUtil.isNullOrUndefined(userName)) {
+            log.error("userAccount::{},role::{},userName::{}", userAccount, role, userName);
+            userName = userAccount;
+        }
+
+
+        //组装claims
+        Map<String, Object> claims = new HashMap<>() {{
+            put("userAccount", userAccount);
+            put("role", role);
+            put("description", "access");
+        }};
+
+        claims.put("userName", userName);
+
+
+        JwtBuilder accessBuilder = Jwts.builder().signWith(sk)
+                .claims(claims)
+                .expiration(expDate);
+
+        //refreshToken组装
+
+        Calendar instance = Calendar.getInstance();
+        instance.add(Calendar.DAY_OF_MONTH, 5);
+        Date refreshExpDate = instance.getTime();
+        Map<String, Object> refreshClaims = new HashMap<>() {{
+            put("userAccount", userAccount);
+            put("role", role);
+
+            put("description", "refresh");
+        }};
+
+        refreshClaims.put("userName", userName);
+
+        JwtBuilder refreshBuilder = Jwts.builder().signWith(sk)
+                .claims(refreshClaims)
+                .expiration(refreshExpDate);
+        return new HashMap<>() {{
+            put("accessToken", accessBuilder.compact());
+            put("refreshToken", refreshBuilder.compact());
+        }};
+    }
+
+
     public static Claims verify(String secretKey, String token) {
         SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
 
         JwtParser parser = Jwts.parser().verifyWith(key).build();
+        Jws<Claims> claims;
+        try {
+            claims = parser.parseSignedClaims(token);
+        } catch (ExpiredJwtException e) {
+            log.error("accessToken过期::cause::{}::msg::{}", e.getCause(), e.getMessage());
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "token过期");
+        } catch (JwtException e) {
+            log.error("{}::解析过程出现异常::cause::{}::msg::{}", e.getCause(), e.getMessage());
+            throw new BusinessException(ErrorCode.OPERATION_ERROR);
+        }
 
-        Jws<Claims> claims = parser.parseSignedClaims(token);
 
         return claims.getPayload();
 
+    }
+
+    public static Claims verify(SecretKey secretKey, String token) {
+
+        JwtParser parser = Jwts.parser().verifyWith(secretKey).build();
+        Jws<Claims> claims;
+        try {
+            claims = parser.parseSignedClaims(token);
+        } catch (ExpiredJwtException e) {
+            log.error("accessToken过期::cause::{}::msg::{}", e.getCause(), e.getMessage());
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "token过期");
+        } catch (JwtException e) {
+            log.error("{}::解析过程出现异常::cause::{}::msg::{}", e.getCause(), e.getMessage());
+            throw new BusinessException(ErrorCode.OPERATION_ERROR);
+        }
+
+
+        return claims.getPayload();
+
+    }
+
+    public static SecretKey getSecretKey() {
+        SecretKey secretKey = Jwts.SIG.HS256.key().build();
+        ThrowUtil.throwIf(Objects.isNull(secretKey), ErrorCode.OPERATION_ERROR, () -> log.error("{}::SecretKey生成失败", JWTUtil.class.getSimpleName()));
+        return secretKey;
     }
 
 }

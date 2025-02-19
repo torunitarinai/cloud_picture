@@ -1,4 +1,4 @@
-package com.example.finaldemo.controller.aop;
+package com.example.finaldemo.controller.interceptor;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,5 +7,5 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface LoginRequired {
+public @interface Login {
 }

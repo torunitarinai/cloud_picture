@@ -23,11 +23,7 @@ public class GlobalExceptionHandler {
         return ResultUtil.error(ErrorCode.SYSTEM_ERROR, "系统错误");
     }
 
-    @ExceptionHandler(ExpiredJwtException.class)
-    public BaseResponse<?> jwtExpiredException(ExpiredJwtException e){
-        log.error("accessToken过期::cause::{}::msg::{}",e.getCause(),e.getMessage());
-        return ResultUtil.error(ErrorCode.NOT_LOGIN_ERROR);
-    }
+
 
 }
 

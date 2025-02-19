@@ -16,11 +16,11 @@ public interface UserMapper {
     @Select("select count(*) from user where user_account=#{userAccount}")
     long countByAccount(String userAccount);
 
-    @Insert("insert into user(user_account,user_password,user_role,salt) value (#{user.userAccount},#{user.userPassword},#{user.userRole},#{user.salt})")
-    @Options(useGeneratedKeys = true)
+    @Insert("insert into user(user_account,user_password,user_role,salt) value (#{userAccount}, #{userPassword}, #{userRole}, #{salt})")
+    @Options(useGeneratedKeys = true,keyProperty = "id")
     int insert(User user);
 
-    @Select("select id,user_account,user_role,user_password,salt from user where user_account = #{tmpUser.userAccount}")
+    @Select("select id,user_account,user_role,user_password,salt from user where user_account = #{userAccount}")
     User selectByUserAccount(User tmpUser);
 }
 

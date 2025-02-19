@@ -65,6 +65,7 @@ public class UserController {
         return ResultUtil.success(jwtMap);
     }
 
+
     @GetMapping("/refresh")
     public BaseResponse<String> refreshAccessToken(@RequestBody UserRefreshRequest refreshRequest) {
         ThrowUtil.throwIf(Objects.isNull(refreshRequest) || StrUtil.isBlank(refreshRequest.getRefreshToken()),
