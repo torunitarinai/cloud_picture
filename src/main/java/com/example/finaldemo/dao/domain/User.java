@@ -1,6 +1,8 @@
 package com.example.finaldemo.dao.domain;
 
 import java.util.Date;
+
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -8,6 +10,7 @@ import lombok.Data;
  * @TableName user
  */
 @Data
+@Builder
 public class User {
     /**
      * id
@@ -63,4 +66,7 @@ public class User {
      * 逻辑删除0：未删除，1：删除
      */
     private Integer isDelete;
+
+
+    private String salt;
 }

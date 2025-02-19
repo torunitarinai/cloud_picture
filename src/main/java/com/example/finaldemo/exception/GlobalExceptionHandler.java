@@ -2,6 +2,7 @@ package com.example.finaldemo.exception;
 
 import com.example.finaldemo.common.BaseResponse;
 import com.example.finaldemo.common.utils.ResultUtil;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -21,6 +22,13 @@ public class GlobalExceptionHandler {
         log.error("RuntimeException", e);
         return ResultUtil.error(ErrorCode.SYSTEM_ERROR, "系统错误");
     }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public BaseResponse<?> jwtExpiredException(ExpiredJwtException e){
+        log.error("accessToken过期::cause::{}::msg::{}",e.getCause(),e.getMessage());
+        return ResultUtil.error(ErrorCode.NOT_LOGIN_ERROR);
+    }
+
 }
 
 

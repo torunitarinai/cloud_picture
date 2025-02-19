@@ -1,6 +1,9 @@
-package com.example.finaldemo.server;
+package com.example.finaldemo.service;
 
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.digest.MD5;
 import com.example.finaldemo.common.utils.RSAUtil;
+import org.junit.Test;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -10,6 +13,8 @@ import java.util.Map;
 public class KeyService {
     private String privateKey;
     private String publicKey;
+
+    private final MD5 md5 = new MD5();
 
     @PostConstruct
     public void init() {
@@ -25,4 +30,18 @@ public class KeyService {
     public String getPrivateKey() {
         return this.privateKey;
     }
+
+    public String decrypt(String userPassword) {
+        return RSAUtil.decrypt(userPassword, this.privateKey);
+    }
+
+
+    public String md5Encode(String text, String salt) {
+        if (StrUtil.isBlank(text)) {
+            return "";
+        }
+
+        return md5.digestHex(text + salt);
+    }
+
 }
