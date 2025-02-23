@@ -69,7 +69,7 @@ public class JWTUtil {
     }
 
 
-    public static String generateAccessToken(Claims claims, SecretKey secretKey, int amount) {
+    public static String generateAccessToken(Map<String,Object> claims, SecretKey secretKey, int amount) {
         Calendar calendar = Calendar.getInstance();
         Date expTime;
         //默认过期时间
@@ -80,7 +80,6 @@ public class JWTUtil {
             calendar.add(Calendar.HOUR, amount);
             expTime = calendar.getTime();
         }
-
 
 
         return Jwts.builder().signWith(secretKey).expiration(expTime).claims(claims).compact();
@@ -109,7 +108,8 @@ public class JWTUtil {
 
         //如果userName为空则用userAccount代替
         if (StrUtil.isNullOrUndefined(userName)) {
-            log.error("userAccount::{},role::{},userName::{}", userAccount, role, userName);
+            log.error("userAccount::{},role::{},userName::{},error occurred at {}:{}", userAccount, role, userName, Thread.currentThread().
+                    getStackTrace()[2].getClassName(), Thread.currentThread().getStackTrace()[2].getLineNumber());
             userName = userAccount;
         }
 
@@ -243,7 +243,7 @@ public class JWTUtil {
             log.error("accessToken过期::cause::{}::msg::{}", e.getCause(), e.getMessage());
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "token过期");
         } catch (JwtException e) {
-            log.error("{}::解析过程出现异常::cause::{}::msg::{}", e.getCause(), e.getMessage());
+            log.error("{}::解析过程出现异常::cause::{}::msg::{}", Thread.currentThread().getStackTrace()[2].getClassName(),e.getCause() ,e.getMessage());
             throw new BusinessException(ErrorCode.OPERATION_ERROR);
         }
 

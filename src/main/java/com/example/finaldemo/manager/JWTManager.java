@@ -1,20 +1,22 @@
-package com.example.finaldemo.service;
+package com.example.finaldemo.manager;
 
+import cn.hutool.core.util.StrUtil;
 import com.example.finaldemo.common.utils.JWTUtil;
-import com.example.finaldemo.exception.BusinessException;
+import com.example.finaldemo.common.utils.ThrowUtil;
 import com.example.finaldemo.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
 @Service
-public class JWTService {
+public class JWTManager {
 
     private final SecretKey SECRET_KEY = JWTUtil.getSecretKey();
 
@@ -27,6 +29,9 @@ public class JWTService {
      * @return 是否有效 有效->true
      */
     public boolean verify(String token) {
+        if (StrUtil.isBlank(token)) {
+            return false;
+        }
         Claims verify = JWTUtil.verify(SECRET_KEY, token);
         return Objects.nonNull(verify);
     }
@@ -38,11 +43,11 @@ public class JWTService {
     public String refreshAccessToken(String refreshToken) {
         Optional<Claims> tokenClaims = getTokenClaims(refreshToken);
 
-        tokenClaims.ifPresentOrElse(claims -> claims.put("description", "access"), () -> {
-            log.error("{}::refreshToken丢失Claims", getClass());
-            throw new BusinessException(ErrorCode.OPERATION_ERROR, "token不合法");
-        });
+        ThrowUtil.throwIf(tokenClaims.isEmpty(), ErrorCode.PARAMS_ERROR,"非法token");
 
-        return JWTUtil.generateAccessToken(tokenClaims.get(), this.SECRET_KEY, 0);
+        Claims claims = tokenClaims.get();
+        Map<String, Object> newClaims = new HashMap<>(claims);
+
+        return JWTUtil.generateAccessToken(newClaims, this.SECRET_KEY, 0);
     }
 }

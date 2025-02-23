@@ -32,7 +32,7 @@ public class ThrowUtil {
 
 
     public static void throwIf(boolean condition, ErrorCode errorCode, Runnable r) {
-        if (Objects.nonNull(r)) {
+        if (condition && Objects.nonNull(r)) {
             r.run();
         }
         throwIf(condition, new BusinessException(errorCode));

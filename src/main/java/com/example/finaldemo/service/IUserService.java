@@ -17,4 +17,7 @@ public interface IUserService {
     Map<String, String> userLogin(String userAccount, String userPassword);
 
     String userRefreshAccessToken(String refreshToken);
+
+    void userLogout(String accessToken, String refreshToken);
+
 }

@@ -2,11 +2,13 @@ package com.example.finaldemo.controller.interceptor;
 
 import cn.hutool.core.util.StrUtil;
 import com.example.finaldemo.common.utils.ThrowUtil;
-import com.example.finaldemo.controller.aop.UserContext;
+import com.example.finaldemo.controller.aop.Login;
+import com.example.finaldemo.dao.domain.UserDto;
+import com.example.finaldemo.manager.UserContext;
 import com.example.finaldemo.dao.domain.User;
 import com.example.finaldemo.exception.BusinessException;
 import com.example.finaldemo.exception.ErrorCode;
-import com.example.finaldemo.service.JWTService;
+import com.example.finaldemo.manager.JWTManager;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,10 +24,10 @@ import java.util.Optional;
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
 
-    private final JWTService jwtService;
+    private final JWTManager jwtManager;
 
-    public LoginInterceptor(JWTService jwtService) {
-        this.jwtService = jwtService;
+    public LoginInterceptor(JWTManager jwtManager) {
+        this.jwtManager = jwtManager;
     }
 
     @Override
@@ -43,14 +45,14 @@ public class LoginInterceptor implements HandlerInterceptor {
         String token = request.getHeader("token");
         ThrowUtil.throwIf(StrUtil.isBlank(token), ErrorCode.NOT_LOGIN_ERROR, () -> log.error("{}::2路径 {}", getClass().getSimpleName(), requestURI));
 
-        Optional<Claims> tokenClaims = jwtService.getTokenClaims(token);
+        Optional<Claims> tokenClaims = jwtManager.getTokenClaims(token);
         if (tokenClaims.isEmpty()) {
             log.error("{}::Token不合法", getClass());
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "非法token");
         } else {
             // 放入上下文
             Claims claims = tokenClaims.get();
-            User user = User.builder()
+            UserDto user = UserDto.builder()
                     .userAccount((String) claims.get("userAccount"))
                     .userRole((String) claims.get("role"))
                     .userName((String) claims.get("userName"))
@@ -64,6 +66,9 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        if (!isLoginRequired(handler)){
+            return;
+        }
         UserContext.remove();
         HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
     }

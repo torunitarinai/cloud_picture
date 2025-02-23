@@ -1,16 +1,15 @@
-package com.example.finaldemo.service;
+package com.example.finaldemo.manager;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.MD5;
 import com.example.finaldemo.common.utils.RSAUtil;
-import org.junit.Test;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.Map;
 
 @Service
-public class KeyService {
+public class KeyManager {
     private String privateKey;
     private String publicKey;
 

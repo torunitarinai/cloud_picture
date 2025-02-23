@@ -1,6 +1,7 @@
 package com.example.finaldemo.dao.mapper;
 
 import com.example.finaldemo.dao.domain.User;
+import com.example.finaldemo.dao.domain.UserDto;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
@@ -20,8 +21,8 @@ public interface UserMapper {
     @Options(useGeneratedKeys = true,keyProperty = "id")
     int insert(User user);
 
-    @Select("select id,user_account,user_role,user_password,salt from user where user_account = #{userAccount}")
-    User selectByUserAccount(User tmpUser);
+    @Select("select id, user_account, user_name, user_role, user_password, salt from user where user_account = #{userAccount}")
+    UserDto selectByUserAccount(User tmpUser);
 }
 
 

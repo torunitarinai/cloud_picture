@@ -10,7 +10,7 @@ import com.example.finaldemo.dao.model.dto.user.UserRegisterRequest;
 import com.example.finaldemo.exception.BusinessException;
 import com.example.finaldemo.exception.ErrorCode;
 import com.example.finaldemo.service.IUserService;
-import com.example.finaldemo.service.JWTService;
+import com.example.finaldemo.manager.JWTManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +31,7 @@ public class UserController {
     private final IUserService userService;
 
 
-    public UserController(IUserService userService, JWTService jwtService) {
+    public UserController(IUserService userService, JWTManager jwtManager) {
         this.userService = userService;
 
     }
@@ -66,7 +66,7 @@ public class UserController {
     }
 
 
-    @GetMapping("/refresh")
+    @PutMapping("/refresh")
     public BaseResponse<String> refreshAccessToken(@RequestBody UserRefreshRequest refreshRequest) {
         ThrowUtil.throwIf(Objects.isNull(refreshRequest) || StrUtil.isBlank(refreshRequest.getRefreshToken()),
                 ErrorCode.PARAMS_ERROR,

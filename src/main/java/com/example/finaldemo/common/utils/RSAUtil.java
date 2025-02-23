@@ -40,7 +40,7 @@ public class RSAUtil {
         String privateKeyStr = Base64.encode(privateKey.getEncoded());
         String publicKeyStr = Base64.encode(publicKey.getEncoded());
 
-        ThrowUtil.throwIf(StrUtil.isBlank(privateKeyStr) || StrUtil.isBlank(publicKeyStr), ErrorCode.OPERATION_ERROR, () -> log.error("{}::秘钥生成失败", RSAUtil.class));
+        ThrowUtil.throwIf(StrUtil.isBlank(privateKeyStr) || StrUtil.isBlank(publicKeyStr), ErrorCode.OPERATION_ERROR, () -> log.error("{}::秘钥生成失败，privateKeyStr::{}::publicKeyStr{},", RSAUtil.class,privateKeyStr==null?"null":privateKeyStr,publicKeyStr==null?"null":publicKeyStr));
 
         return new HashMap<>() {{
             put("public", publicKeyStr);

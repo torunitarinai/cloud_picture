@@ -1,5 +1,6 @@
 package com.example.finaldemo.exception;
 
+import cn.hutool.crypto.CryptoException;
 import com.example.finaldemo.common.BaseResponse;
 import com.example.finaldemo.common.utils.ResultUtil;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -23,6 +24,12 @@ public class GlobalExceptionHandler {
         return ResultUtil.error(ErrorCode.SYSTEM_ERROR, "系统错误");
     }
 
+    @ExceptionHandler(CryptoException.class)
+    public BaseResponse<?> decryptionErrorHandler(CryptoException e){
+        StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[2];
+        log.error("{}::解密发生错误,位于::{}", stackTraceElement.getClassName(),stackTraceElement.getLineNumber());
+        return ResultUtil.error(ErrorCode.SYSTEM_ERROR);
+    }
 
 
 }

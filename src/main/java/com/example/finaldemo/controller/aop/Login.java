@@ -1,4 +1,4 @@
-package com.example.finaldemo.controller.interceptor;
+package com.example.finaldemo.controller.aop;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
