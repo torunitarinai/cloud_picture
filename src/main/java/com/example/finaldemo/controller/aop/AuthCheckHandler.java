@@ -11,6 +11,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -25,7 +26,7 @@ public class AuthCheckHandler {
 
     @Before("pointCut()")
     public void authCheck(JoinPoint joinPoint) {
-        AuthRequired authRequired = joinPoint.getTarget().getClass().getAnnotation(AuthRequired.class);
+        AuthRequired authRequired = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(AuthRequired.class);
         UserRoleEnum requiredLevel = authRequired.level();
         String role = UserContext.getCurrentUserRole();
 

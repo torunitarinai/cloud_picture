@@ -26,8 +26,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CryptoException.class)
     public BaseResponse<?> decryptionErrorHandler(CryptoException e){
-        StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[2];
-        log.error("{}::解密发生错误,位于::{}", stackTraceElement.getClassName(),stackTraceElement.getLineNumber());
+        // 获取异常的第一个堆栈元素
+        StackTraceElement stackTraceElement = e.getStackTrace()[0];
+        log.error("解密错误发生于 {}#{} (行: {})",
+                stackTraceElement.getClassName(),
+                stackTraceElement.getMethodName(),
+                stackTraceElement.getLineNumber(),
+                e);  // 将异常对象作为日志的最后一个参数，这样可以打印完整堆栈
         return ResultUtil.error(ErrorCode.SYSTEM_ERROR);
     }
 
