@@ -1,8 +1,10 @@
 package com.example.finaldemo.dao.model.dto.file;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class UploadPictureResult {  
   
     /**  

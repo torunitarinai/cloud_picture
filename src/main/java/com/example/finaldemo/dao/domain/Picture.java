@@ -64,9 +64,9 @@ public class Picture implements Serializable {
     private String picFormat;
 
     /**
-     * 创建用户 id
+     * 创建用户账户
      */
-    private Long userId;
+    private String account;
 
     /**
      * 创建时间
